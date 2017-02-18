@@ -1,0 +1,28 @@
+---
+version: "2"
+services:
+  skydns:
+    image: skynetservices/skydns
+    hostname: skydns
+    ports:
+    - "10053:53/tcp"
+    - "10053:53/udp"
+    links:
+    - etcd:etcd
+    # https://github.com/skynetservices/skydns#environment-variables
+    environment:
+    - ETCD_MACHINES=http://etcd:2379
+    # Replace with the DNS servers of your domain
+    - SKYDNS_NAMESERVERS=8.8.8.8:53,8.8.4.4:53
+    command:
+    - -addr=0.0.0.0:53
+  etcd:
+    image: quay.io/coreos/etcd
+    hostname: etcd
+    ports:
+    - 2379:2379
+    - 2380:2380
+    # https://coreos.com/etcd/docs/latest/op-guide/configuration.html
+    environment:
+    - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+    - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
